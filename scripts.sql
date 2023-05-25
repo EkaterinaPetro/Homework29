@@ -1,6 +1,6 @@
-select * from "student" WHERE age > 20 AND age < 24;
+select * from "student" WHERE age between 20 and 24;
 
-select name from "student" GROUP BY name;
+select name from "student";
 
 select * from "student" WHERE name LIKE '%a%';
 
