@@ -1,8 +1,9 @@
 package ru.hogwarts.school.service;
 
 import org.springframework.stereotype.Service;
-import ru.hogwarts.school.model.Faculty;
-import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.exception.FacultyNotFoundException;
+import ru.hogwarts.school.model.entity.Faculty;
+import ru.hogwarts.school.model.entity.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 
 import java.util.List;
@@ -17,8 +18,8 @@ public class FacultyService {
 
     public Faculty createFaculty(String name, String color) {
         Faculty faculty = new Faculty(name, color);
-        facultyRepository.save(faculty);
-        return faculty;
+        Faculty facultyCreate = facultyRepository.save(faculty);
+        return facultyCreate;
     }
 
     public Faculty getFacultyById(Long id) {
@@ -26,7 +27,7 @@ public class FacultyService {
     }
 
     public Faculty updateFaculty(Long id, String name, String color) {
-        Faculty faculty = facultyRepository.findById(id).orElse(null);
+        Faculty faculty = facultyRepository.findById(id).orElseThrow(FacultyNotFoundException::new);
         faculty.setName(name);
         faculty.setColor(color);
         facultyRepository.save(faculty);
@@ -34,7 +35,7 @@ public class FacultyService {
     }
 
     public Faculty deleteFaculty(Long id) {
-        Faculty faculty = facultyRepository.findById(id).orElse(null);
+        Faculty faculty = facultyRepository.findById(id).orElseThrow(FacultyNotFoundException::new);
         facultyRepository.deleteById(id);
         return faculty;
     }

@@ -1,8 +1,13 @@
 package ru.hogwarts.school.controller;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.hogwarts.school.model.Faculty;
-import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.exception.StudentNotFoundException;
+import ru.hogwarts.school.model.entity.Faculty;
+import ru.hogwarts.school.model.entity.Student;
+import ru.hogwarts.school.model.request.StudentCreateRequest;
+import ru.hogwarts.school.model.request.StudentUpdateRequest;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.List;
@@ -17,8 +22,8 @@ public class StudentController {
     }
 
     @PostMapping
-    public Student createStudent(@RequestParam String name, @RequestParam int age, @RequestParam Long facultyId) {
-        return studentService.createStudent(name, age, facultyId);
+    public Student createStudent(@RequestBody StudentCreateRequest request) {
+        return studentService.createStudent(request.getName(), request.getAge(), request.getFacultyId());
     }
 
     @GetMapping("/{id}")
@@ -27,13 +32,21 @@ public class StudentController {
     }
 
     @PutMapping("/{id}")
-    public Student updateStudent(@PathVariable Long id, @RequestParam String name, @RequestParam int age) {
-        return studentService.updateStudent(id, name, age);
+    public ResponseEntity<Student> updateStudent(@PathVariable Long id, @RequestBody StudentUpdateRequest request) {
+        try {
+            return ResponseEntity.ok(studentService.updateStudent(id, request.getName(), request.getAge()));
+        } catch (StudentNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
-    public Student deleteStudent(@PathVariable Long id) {
-        return studentService.deleteStudent(id);
+    public ResponseEntity<Student> deleteStudent(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(studentService.deleteStudent(id));
+        } catch (StudentNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/age")
