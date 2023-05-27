@@ -4,8 +4,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.exception.FacultyNotFoundException;
 import ru.hogwarts.school.exception.StudentNotFoundException;
-import ru.hogwarts.school.model.entity.Faculty;
-import ru.hogwarts.school.model.entity.Student;
 import ru.hogwarts.school.model.request.StudentCreateRequest;
 import ru.hogwarts.school.model.request.StudentUpdateRequest;
 import ru.hogwarts.school.model.response.FacultyResponse;
@@ -26,7 +24,8 @@ public class StudentController {
     @PostMapping
     public ResponseEntity<StudentResponse> createStudent(@RequestBody StudentCreateRequest request) {
         try {
-            return ResponseEntity.ok(studentService.createStudent(request.getName(), request.getAge(), request.getFacultyId()));
+            return ResponseEntity.ok(studentService.createStudent(request.getName(), request.getAge(),
+                    request.getFacultyId()));
         } catch (FacultyNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
@@ -42,7 +41,8 @@ public class StudentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<StudentResponse> updateStudent(@PathVariable Long id, @RequestBody StudentUpdateRequest request) {
+    public ResponseEntity<StudentResponse> updateStudent(@PathVariable Long id,
+                                                         @RequestBody StudentUpdateRequest request) {
         try {
             return ResponseEntity.ok(studentService.updateStudent(id, request.getName(), request.getAge()));
         } catch (StudentNotFoundException e) {
@@ -66,7 +66,7 @@ public class StudentController {
 
     @GetMapping("/age-between")
     public List<StudentResponse> getStudentByAgeBetween(@RequestParam int max, @RequestParam int min) {
-        return studentService.getStudentByAgeBetween(max, min);
+        return studentService.getStudentByAgeBetween(min, max);
     }
 
     @GetMapping("/{id}/faculty")

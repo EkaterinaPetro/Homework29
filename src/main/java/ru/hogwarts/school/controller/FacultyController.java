@@ -3,8 +3,6 @@ package ru.hogwarts.school.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.exception.FacultyNotFoundException;
-import ru.hogwarts.school.model.entity.Faculty;
-import ru.hogwarts.school.model.entity.Student;
 import ru.hogwarts.school.model.request.FacultyCreateRequest;
 import ru.hogwarts.school.model.request.FacultyUpdateRequest;
 import ru.hogwarts.school.model.response.FacultyResponse;
@@ -37,7 +35,8 @@ public class FacultyController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<FacultyResponse> updateFaculty(@PathVariable Long id, @RequestBody FacultyUpdateRequest request) {
+    public ResponseEntity<FacultyResponse> updateFaculty(@PathVariable Long id,
+                                                         @RequestBody FacultyUpdateRequest request) {
         try {
             return ResponseEntity.ok(facultyService.updateFaculty(id, request.getName(), request.getColor()));
         } catch (FacultyNotFoundException e) {
