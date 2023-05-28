@@ -2,11 +2,15 @@ package ru.hogwarts.school.service;
 
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.exception.FacultyNotFoundException;
+import ru.hogwarts.school.mapper.FacultyMapper;
+import ru.hogwarts.school.mapper.StudentMapper;
 import ru.hogwarts.school.model.entity.Faculty;
-import ru.hogwarts.school.model.entity.Student;
+import ru.hogwarts.school.model.response.FacultyResponse;
+import ru.hogwarts.school.model.response.StudentResponse;
 import ru.hogwarts.school.repository.FacultyRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FacultyService {
@@ -16,40 +20,49 @@ public class FacultyService {
         this.facultyRepository = facultyRepository;
     }
 
-    public Faculty createFaculty(String name, String color) {
+    public FacultyResponse createFaculty(String name, String color) {
         Faculty faculty = new Faculty(name, color);
         Faculty facultyCreate = facultyRepository.save(faculty);
-        return facultyCreate;
+        return FacultyMapper.toResponse(facultyCreate);
     }
 
-    public Faculty getFacultyById(Long id) {
-        return facultyRepository.findById(id).orElse(null);
+    public FacultyResponse getFacultyById(Long id) {
+        Faculty faculty = facultyRepository.findById(id).orElseThrow(FacultyNotFoundException::new);
+        return FacultyMapper.toResponse(faculty);
     }
 
-    public Faculty updateFaculty(Long id, String name, String color) {
+    public FacultyResponse updateFaculty(Long id, String name, String color) {
         Faculty faculty = facultyRepository.findById(id).orElseThrow(FacultyNotFoundException::new);
         faculty.setName(name);
         faculty.setColor(color);
         facultyRepository.save(faculty);
-        return faculty;
+        return FacultyMapper.toResponse(faculty);
     }
 
-    public Faculty deleteFaculty(Long id) {
+    public FacultyResponse deleteFaculty(Long id) {
         Faculty faculty = facultyRepository.findById(id).orElseThrow(FacultyNotFoundException::new);
         facultyRepository.deleteById(id);
-        return faculty;
+        return FacultyMapper.toResponse(faculty);
     }
 
-    public List<Faculty> getFacultyByColor(String color) {
-        return facultyRepository.findAllByColor(color);
+    public List<FacultyResponse> getFacultyByColor(String color) {
+        List<Faculty> faculties = facultyRepository.findAllByColor(color);
+        return faculties.stream()
+                .map(FacultyMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
-    public List<Faculty> getFacultyByName(String name) {
-        return facultyRepository.findAllByName(name);
+    public List<FacultyResponse> getFacultyByName(String name) {
+        List<Faculty> faculties = facultyRepository.findAllByName(name);
+        return faculties.stream()
+                .map(FacultyMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
-    public List<Student> getStudentsByFaculty(Long id) {
-        Faculty faculty = facultyRepository.findById(id).orElse(null);
-        return faculty.getStudents();
+    public List<StudentResponse> getStudentsByFaculty(Long id) {
+        Faculty faculty = facultyRepository.findById(id).orElseThrow(FacultyNotFoundException::new);
+        return faculty.getStudents().stream()
+                .map(StudentMapper::toResponse)
+                .collect(Collectors.toList());
     }
 }

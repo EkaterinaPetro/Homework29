@@ -7,6 +7,8 @@ import ru.hogwarts.school.model.entity.Faculty;
 import ru.hogwarts.school.model.entity.Student;
 import ru.hogwarts.school.model.request.FacultyCreateRequest;
 import ru.hogwarts.school.model.request.FacultyUpdateRequest;
+import ru.hogwarts.school.model.response.FacultyResponse;
+import ru.hogwarts.school.model.response.StudentResponse;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.List;
@@ -21,17 +23,21 @@ public class FacultyController {
     }
 
     @PostMapping
-    public Faculty createFaculty(@RequestBody FacultyCreateRequest request) {
+    public FacultyResponse createFaculty(@RequestBody FacultyCreateRequest request) {
         return facultyService.createFaculty(request.getName(), request.getColor());
     }
 
     @GetMapping("/{id}")
-    public Faculty getFaculty(@PathVariable Long id) {
-        return facultyService.getFacultyById(id);
+    public ResponseEntity<FacultyResponse> getFaculty(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(facultyService.getFacultyById(id));
+        } catch (FacultyNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Faculty> updateFaculty(@PathVariable Long id, @RequestBody FacultyUpdateRequest request) {
+    public ResponseEntity<FacultyResponse> updateFaculty(@PathVariable Long id, @RequestBody FacultyUpdateRequest request) {
         try {
             return ResponseEntity.ok(facultyService.updateFaculty(id, request.getName(), request.getColor()));
         } catch (FacultyNotFoundException e) {
@@ -40,7 +46,7 @@ public class FacultyController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Faculty> deleteFaculty(@PathVariable Long id) {
+    public ResponseEntity<FacultyResponse> deleteFaculty(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(facultyService.deleteFaculty(id));
         } catch (FacultyNotFoundException e) {
@@ -49,17 +55,21 @@ public class FacultyController {
     }
 
     @GetMapping("/color")
-    public List<Faculty> getFacultyByColor(@RequestParam String color) {
+    public List<FacultyResponse> getFacultyByColor(@RequestParam String color) {
         return facultyService.getFacultyByColor(color);
     }
 
     @GetMapping("/name")
-    public List<Faculty> getFacultyByName(@RequestParam String name) {
+    public List<FacultyResponse> getFacultyByName(@RequestParam String name) {
         return facultyService.getFacultyByName(name);
     }
 
     @GetMapping("/{id}/students")
-    public List<Student> getStudentsByFaculty(@PathVariable Long id) {
-        return facultyService.getStudentsByFaculty(id);
+    public ResponseEntity<List<StudentResponse>> getStudentsByFaculty(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(facultyService.getStudentsByFaculty(id));
+        } catch (FacultyNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
