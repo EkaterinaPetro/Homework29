@@ -37,21 +37,24 @@ public class StudentServiceTests {
 
     @Test
     void createStudent_shouldReturnStudent() {
-        StudentResponse student = studentService.createStudent("Oleg", 24, 1L);
+        Faculty faculty = facultyRepository.save(new Faculty("test", "test"));
+        StudentResponse student = studentService.createStudent("Oleg", 24, faculty.getId());
         Assertions.assertEquals("Oleg", student.getName());
         Assertions.assertEquals(24, student.getAge());
     }
 
     @Test
     void createStudent_shouldCreateStudentUniqueID() {
-        StudentResponse student1 = studentService.createStudent("Oleg1", 24, 1L);
-        StudentResponse student2 = studentService.createStudent("Oleg2", 24, 1L);
+        Faculty faculty = facultyRepository.save(new Faculty("test", "test"));
+        StudentResponse student1 = studentService.createStudent("Oleg1", 24, faculty.getId());
+        StudentResponse student2 = studentService.createStudent("Oleg2", 24, faculty.getId());
         Assertions.assertNotEquals(student1.getId(), student2.getId());
     }
 
     @Test
     void getStudentById_shouldReturnStudent() {
-        StudentResponse student = studentService.createStudent("Oleg", 24, 1L);
+        Faculty faculty = facultyRepository.save(new Faculty("test", "test"));
+        StudentResponse student = studentService.createStudent("Oleg", 24, faculty.getId());
         StudentResponse result = studentService.getStudentById(student.getId());
         Assertions.assertEquals("Oleg", result.getName());
         Assertions.assertEquals(24, result.getAge());
@@ -59,7 +62,8 @@ public class StudentServiceTests {
 
     @Test
     void updateStudent_shouldReturnStudentWithNewNameAndAge() {
-        StudentResponse student = studentService.createStudent("Oleg", 24, 1L);
+        Faculty faculty = facultyRepository.save(new Faculty("test", "test"));
+        StudentResponse student = studentService.createStudent("Oleg", 24, faculty.getId());
         StudentResponse result = studentService. updateStudent(student.getId(), "Oleg1", 25);
         Assertions.assertEquals("Oleg1", result.getName());
         Assertions.assertEquals(25, result.getAge());
@@ -73,7 +77,8 @@ public class StudentServiceTests {
 
     @Test
     void deleteStudent_shouldReturnDeletedStudent() {
-        StudentResponse student = studentService.createStudent("Oleg", 24, 1L);
+        Faculty faculty = facultyRepository.save(new Faculty("test", "test"));
+        StudentResponse student = studentService.createStudent("Oleg", 24, faculty.getId());
         StudentResponse result = studentService.deleteStudent(student.getId());
         Assertions.assertEquals("Oleg", result.getName());
         Assertions.assertEquals(24, result.getAge());
@@ -87,9 +92,10 @@ public class StudentServiceTests {
 
     @Test
     void getStudentByAge_shouldReturnListOfStudents() {
-        studentService.createStudent("Oleg1", 24, 1L);
-        studentService.createStudent("Oleg2", 24, 1L);
-        studentService.createStudent("Oleg3", 25, 1L);
+        Faculty faculty = facultyRepository.save(new Faculty("test", "test"));
+        studentService.createStudent("Oleg1", 24, faculty.getId());
+        studentService.createStudent("Oleg2", 24, faculty.getId());
+        studentService.createStudent("Oleg3", 25, faculty.getId());
         List<StudentResponse> students = studentService.getStudentByAge(24);
         Assertions.assertEquals(2, students.size());
         Assertions.assertEquals("Oleg1", students.get(0).getName());
@@ -100,9 +106,10 @@ public class StudentServiceTests {
 
     @Test
     void getStudentByAgeBetween_shouldReturnListOfStudents() {
-        studentService.createStudent("Oleg1", 24, 1L);
-        studentService.createStudent("Oleg2", 24, 1L);
-        studentService.createStudent("Oleg3", 25, 1L);
+        Faculty faculty = facultyRepository.save(new Faculty("test", "test"));
+        studentService.createStudent("Oleg1", 24, faculty.getId());
+        studentService.createStudent("Oleg2", 24, faculty.getId());
+        studentService.createStudent("Oleg3", 25, faculty.getId());
         List<StudentResponse> students = studentService.getStudentByAgeBetween(20, 24);
         Assertions.assertEquals(2, students.size());
         Assertions.assertEquals("Oleg1", students.get(0).getName());

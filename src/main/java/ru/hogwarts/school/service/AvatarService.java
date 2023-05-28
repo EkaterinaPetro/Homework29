@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.hogwarts.school.exception.AvatarNotFoundException;
-import ru.hogwarts.school.exception.FacultyNotFoundException;
 import ru.hogwarts.school.exception.StudentNotFoundException;
 import ru.hogwarts.school.model.entity.Avatar;
 import ru.hogwarts.school.model.entity.Student;
@@ -44,7 +43,7 @@ public class AvatarService {
         ) {
             bis.transferTo(bos);
         }
-        Avatar avatar = avatarRepository.findAvatarByStudentId(studentId).orElseThrow(AvatarNotFoundException::new);
+        Avatar avatar = avatarRepository.findAvatarByStudentId(studentId).orElse(new Avatar());
         avatar.setStudent(student);
         avatar.setFilePath(filePath.toString());
         avatar.setFileSize(avatarFile.getSize());
