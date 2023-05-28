@@ -2,51 +2,43 @@ package ru.hogwarts.school.service;
 
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.repository.FacultyRepository;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class FacultyService {
-    private final Map<Long, Faculty> faculties = new HashMap<>();
+    private final FacultyRepository facultyRepository;
 
-    private Long nextId = 0L;
-
-    private Long getIdAndIncrement() {
-        nextId++;
-        return nextId;
+    public FacultyService(FacultyRepository facultyRepository) {
+        this.facultyRepository = facultyRepository;
     }
 
     public Faculty createFaculty(String name, String color) {
-        Faculty student = new Faculty(getIdAndIncrement(), name, color);
-        faculties.put(student.getId(), student);
-        return student;
+        Faculty faculty = new Faculty(name, color);
+        facultyRepository.save(faculty);
+        return faculty;
     }
 
     public Faculty getFacultyById(Long id) {
-        return faculties.get(id);
+        return facultyRepository.findById(id).orElse(null);
     }
 
     public Faculty updateFaculty(Long id, String name, String color) {
-        Faculty student = faculties.get(id);
-        student.setName(name);
-        student.setColor(color);
-        return student;
+        Faculty faculty = facultyRepository.findById(id).orElse(null);
+        faculty.setName(name);
+        faculty.setColor(color);
+        facultyRepository.save(faculty);
+        return faculty;
     }
 
     public Faculty deleteFaculty(Long id) {
-        return faculties.remove(id);
+        Faculty faculty = facultyRepository.findById(id).orElse(null);
+        facultyRepository.deleteById(id);
+        return faculty;
     }
 
     public List<Faculty> getFacultyByColor(String color) {
-        return faculties.values().stream()
-                .filter(f -> color.equals(f.getColor()))
-                .collect(Collectors.toList());
-    }
-
-    public void deleteAllFaculties() {
-        faculties.clear();
+        return facultyRepository.findAllByColor(color);
     }
 }

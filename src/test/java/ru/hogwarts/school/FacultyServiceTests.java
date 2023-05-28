@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.List;
@@ -15,9 +16,12 @@ public class FacultyServiceTests {
     @Autowired
     private FacultyService facultyService;
 
+    @Autowired
+    private FacultyRepository facultyRepository;
+
     @BeforeEach
     void clear() {
-        facultyService.deleteAllFaculties();
+        facultyRepository.deleteAll();
     }
 
     @Test
@@ -36,10 +40,10 @@ public class FacultyServiceTests {
 
     @Test
     void getFacultyById_shouldReturnFaculty() {
-        facultyService.createFaculty("Slytherin", "Green");
-        Faculty faculty = facultyService.getFacultyById(1L);
-        Assertions.assertEquals("Slytherin", faculty.getName());
-        Assertions.assertEquals("Green", faculty.getColor());
+        Faculty faculty = facultyService.createFaculty("Slytherin", "Green");
+        Faculty result = facultyService.getFacultyById(faculty.getId());
+        Assertions.assertEquals("Slytherin", result.getName());
+        Assertions.assertEquals("Green", result.getColor());
     }
 
     @Test

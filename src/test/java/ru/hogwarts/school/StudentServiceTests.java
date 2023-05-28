@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.List;
@@ -16,9 +17,12 @@ public class StudentServiceTests {
     @Autowired
     private StudentService studentService;
 
+    @Autowired
+    private StudentRepository studentRepository;
+
     @BeforeEach
     void clear() {
-        studentService.deleteAllStudent();
+        studentRepository.deleteAll();
     }
 
     @Test
@@ -53,10 +57,10 @@ public class StudentServiceTests {
 
     @Test
     void deleteStudent_shouldReturnDeletedStudent() {
-        studentService.createStudent("Oleg", 24);
-        Student student = studentService.deleteStudent(1L);
-        Assertions.assertEquals("Oleg", student.getName());
-        Assertions.assertEquals(24, student.getAge());
+        Student student = studentService.createStudent("Oleg", 24);
+        Student result = studentService.deleteStudent(student.getId());
+        Assertions.assertEquals("Oleg", result.getName());
+        Assertions.assertEquals(24, result.getAge());
     }
 
     @Test
