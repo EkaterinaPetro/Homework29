@@ -1,8 +1,12 @@
 package ru.hogwarts.school.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.hogwarts.school.model.Faculty;
-import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.exception.FacultyNotFoundException;
+import ru.hogwarts.school.model.entity.Faculty;
+import ru.hogwarts.school.model.entity.Student;
+import ru.hogwarts.school.model.request.FacultyCreateRequest;
+import ru.hogwarts.school.model.request.FacultyUpdateRequest;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.List;
@@ -17,8 +21,8 @@ public class FacultyController {
     }
 
     @PostMapping
-    public Faculty createFaculty(@RequestParam String name, @RequestParam String color) {
-        return facultyService.createFaculty(name, color);
+    public Faculty createFaculty(@RequestBody FacultyCreateRequest request) {
+        return facultyService.createFaculty(request.getName(), request.getColor());
     }
 
     @GetMapping("/{id}")
@@ -27,13 +31,21 @@ public class FacultyController {
     }
 
     @PutMapping("/{id}")
-    public Faculty updateFaculty(@PathVariable Long id, @RequestParam String name, @RequestParam String color) {
-        return facultyService.updateFaculty(id, name, color);
+    public ResponseEntity<Faculty> updateFaculty(@PathVariable Long id, @RequestBody FacultyUpdateRequest request) {
+        try {
+            return ResponseEntity.ok(facultyService.updateFaculty(id, request.getName(), request.getColor()));
+        } catch (FacultyNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
-    public Faculty deleteFaculty(@PathVariable Long id) {
-        return facultyService.deleteFaculty(id);
+    public ResponseEntity<Faculty> deleteFaculty(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(facultyService.deleteFaculty(id));
+        } catch (FacultyNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/color")
