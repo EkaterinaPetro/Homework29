@@ -1,10 +1,14 @@
 package ru.hogwarts.school.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.hogwarts.school.exception.AvatarNotFoundException;
 import ru.hogwarts.school.exception.StudentNotFoundException;
+import ru.hogwarts.school.mapper.AvatarMapper;
+import ru.hogwarts.school.mapper.StudentMapper;
 import ru.hogwarts.school.model.entity.Avatar;
 import ru.hogwarts.school.model.entity.Student;
 import ru.hogwarts.school.model.response.AvatarResponse;
@@ -14,6 +18,8 @@ import ru.hogwarts.school.repository.StudentRepository;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
@@ -51,12 +57,7 @@ public class AvatarService {
         avatar.setData(avatarFile.getBytes());
         Avatar avatarSave = avatarRepository.save(avatar);
 
-        AvatarResponse avatarResponse = new AvatarResponse();
-        avatarResponse.setId(avatarSave.getId());
-        avatarResponse.setFilePath(avatarSave.getFilePath());
-        avatarResponse.setFileSize(avatarSave.getFileSize());
-        avatarResponse.setMediaType(avatarSave.getMediaType());
-        return avatarResponse;
+        return AvatarMapper.toResponse(avatarSave);
     }
 
     private String getExtensions(String fileName) {
@@ -65,5 +66,13 @@ public class AvatarService {
 
     public Avatar getAvatar(Long id) {
         return avatarRepository.findById(id).orElseThrow(AvatarNotFoundException::new);
+    }
+
+    public List<AvatarResponse> getAll(int page, int size) {
+       return avatarRepository.findAll(PageRequest.of(page, size))
+               .getContent()
+               .stream()
+               .map(AvatarMapper::toResponse)
+               .collect(Collectors.toList());
     }
 }
