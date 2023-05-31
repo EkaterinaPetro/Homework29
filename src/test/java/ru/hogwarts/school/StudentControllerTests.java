@@ -8,6 +8,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -18,13 +20,13 @@ import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.StudentService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -255,5 +257,64 @@ public class StudentControllerTests {
                 .andExpect(jsonPath("$.id").value(facultyId))
                 .andExpect(jsonPath("$.name").value(facultyName))
                 .andExpect(jsonPath("$.color").value(facultyColor));
+    }
+
+    @Test
+    void countStudents_shouldReturnNumber() throws Exception {
+        when(studentRepository.count()).thenReturn(2L);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/student/count")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string("2"));
+    }
+
+    @Test
+    void getAverageAge_shouldReturnNumber() throws Exception {
+        when(studentRepository.getAverageAge()).thenReturn(23.3);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/student/average-age")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string("23.3"));
+    }
+
+    @Test
+    void getLast5Students_shouldReturnListOfStudents() throws Exception {
+        Long id = 1L;
+        Long id2 = 2L;
+        String name = "Bob";
+        String name2 = "Jenna";
+        int age = 17;
+        int age2 = 19;
+
+        Student student = new Student();
+        student.setId(id);
+        student.setName(name);
+        student.setAge(age);
+
+        Student student2 = new Student();
+        student2.setId(id2);
+        student2.setName(name2);
+        student2.setAge(age2);
+
+        List<Student> students = new ArrayList<>();
+        students.add(student);
+        students.add(student2);
+
+        when(studentRepository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(students));
+
+        mockMvc. perform(MockMvcRequestBuilders
+                        .get("/student/last-5")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id").value(id))
+                .andExpect(jsonPath("$.[0].name").value(name))
+                .andExpect(jsonPath("$.[0].age").value(age))
+                .andExpect(jsonPath("$.[1].id").value(id2))
+                .andExpect(jsonPath("$.[1].name").value(name2))
+                .andExpect(jsonPath("$.[1].age").value(age2));
     }
 }

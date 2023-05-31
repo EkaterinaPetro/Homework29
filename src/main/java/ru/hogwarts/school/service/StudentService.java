@@ -1,5 +1,7 @@
 package ru.hogwarts.school.service;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.exception.FacultyNotFoundException;
 import ru.hogwarts.school.exception.StudentNotFoundException;
@@ -69,5 +71,21 @@ StudentService {
     public FacultyResponse getStudentFaculty(Long id) {
         Student student = studentRepository.findById(id).orElseThrow(StudentNotFoundException::new);
         return FacultyMapper.toResponse(student.getFaculty());
+    }
+
+    public Long countStudents() {
+        return studentRepository.count();
+    }
+
+    public double getAverageAge() {
+        return studentRepository.getAverageAge();
+    }
+
+    public List<StudentResponse> getLast5Students() {
+        List<Student> students = studentRepository.findAll(PageRequest.of(0, 5,
+                Sort.by(Sort.Direction.DESC, "id"))).getContent();
+        return students.stream()
+                .map(StudentMapper::toResponse)
+                .collect(Collectors.toList());
     }
 }
