@@ -1,5 +1,7 @@
 package ru.hogwarts.school.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -25,6 +27,7 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
 @Service
 public class AvatarService {
+    Logger logger = LoggerFactory.getLogger(AvatarService.class);
     private final AvatarRepository avatarRepository;
     private final StudentRepository studentRepository;
 
@@ -37,7 +40,11 @@ public class AvatarService {
     }
 
     public AvatarResponse uploadAvatar(Long studentId, MultipartFile avatarFile) throws IOException {
-        Student student = studentRepository.findById(studentId).orElseThrow(StudentNotFoundException::new);
+        logger.info("Was invoked method for upload avatar");
+        Student student = studentRepository.findById(studentId).orElseThrow(() -> {
+            logger.error("There is not student with id = " + studentId);
+            return new StudentNotFoundException();
+        });
         Path filePath = Path.of(avatarsDir, student + "." + getExtensions(avatarFile.getOriginalFilename()));
         Files.createDirectories(filePath.getParent());
         Files.deleteIfExists(filePath);
@@ -49,6 +56,7 @@ public class AvatarService {
         ) {
             bis.transferTo(bos);
         }
+        logger.debug("The file is saved in this path " + filePath);
         Avatar avatar = avatarRepository.findAvatarByStudentId(studentId).orElse(new Avatar());
         avatar.setStudent(student);
         avatar.setFilePath(filePath.toString());
@@ -65,10 +73,15 @@ public class AvatarService {
     }
 
     public Avatar getAvatar(Long id) {
-        return avatarRepository.findById(id).orElseThrow(AvatarNotFoundException::new);
+        logger.info("Was invoked method for get avatar");
+        return avatarRepository.findById(id).orElseThrow(() -> {
+            logger.error("There is not student with id = " + id);
+            return new AvatarNotFoundException();
+        });
     }
 
     public List<AvatarResponse> getAll(int page, int size) {
+        logger.info("Was invoked method for get all avatar");
        return avatarRepository.findAll(PageRequest.of(page, size))
                .getContent()
                .stream()
