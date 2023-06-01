@@ -1,5 +1,9 @@
 package ru.hogwarts.school.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.exception.FacultyNotFoundException;
 import ru.hogwarts.school.exception.StudentNotFoundException;
@@ -18,6 +22,7 @@ import java.util.stream.Collectors;
 @Service
 public class
 StudentService {
+    Logger logger = LoggerFactory.getLogger(StudentService.class);
     private final StudentRepository studentRepository;
     private final FacultyRepository facultyRepository;
 
@@ -27,19 +32,31 @@ StudentService {
     }
 
     public StudentResponse createStudent(String name, int age, Long facultyId) {
-        Faculty faculty = facultyRepository.findById(facultyId).orElseThrow(FacultyNotFoundException::new);
+        logger.info("Was invoked method for create student");
+        Faculty faculty = facultyRepository.findById(facultyId).orElseThrow(() -> {
+            logger.error("There is not faculty with id = " + facultyId);
+            return new FacultyNotFoundException();
+        });
         Student student = new Student(name, age, faculty);
         Student studentCreate = studentRepository.save(student);
         return StudentMapper.toResponse(studentCreate);
     }
 
     public StudentResponse getStudentById(Long id) {
-        Student student = studentRepository.findById(id).orElseThrow(StudentNotFoundException::new);
+        logger.info("Was invoked method for get student by id");
+        Student student = studentRepository.findById(id).orElseThrow(() -> {
+            logger.error("There is not student with id = " + id);
+            return new StudentNotFoundException();
+        });
         return StudentMapper.toResponse(student);
     }
 
     public StudentResponse updateStudent(Long id, String name, int age) {
-        Student student = studentRepository.findById(id).orElseThrow(StudentNotFoundException::new);
+        logger.info("Was invoked method for update student");
+        Student student = studentRepository.findById(id).orElseThrow(() -> {
+            logger.error("There is not student with id = " + id);
+            return new StudentNotFoundException();
+        });
         student.setName(name);
         student.setAge(age);
         studentRepository.save(student);
@@ -47,12 +64,17 @@ StudentService {
     }
 
     public StudentResponse deleteStudent(Long id) {
-        Student student = studentRepository.findById(id).orElseThrow(StudentNotFoundException::new);
+        logger.info("Was invoked method for delete student");
+        Student student = studentRepository.findById(id).orElseThrow(() -> {
+            logger.error("There is not student with id = " + id);
+            return new StudentNotFoundException();
+        });
         studentRepository.deleteById(id);
         return StudentMapper.toResponse(student);
     }
 
     public List<StudentResponse> getStudentByAge(int age) {
+        logger.info("Was invoked method for get student by age");
         List<Student> students = studentRepository.findAllByAge(age);
         return students.stream()
                 .map(StudentMapper::toResponse)
@@ -60,6 +82,7 @@ StudentService {
     }
 
     public List<StudentResponse> getStudentByAgeBetween(int min, int max) {
+        logger.info("Was invoked method for get student by age between");
         List<Student> students = studentRepository.findByAgeBetween(min, max);
         return students.stream()
                 .map(StudentMapper::toResponse)
@@ -67,7 +90,30 @@ StudentService {
     }
 
     public FacultyResponse getStudentFaculty(Long id) {
-        Student student = studentRepository.findById(id).orElseThrow(StudentNotFoundException::new);
+        logger.info("Was invoked method for get student faculty");
+        Student student = studentRepository.findById(id).orElseThrow(() -> {
+            logger.error("There is not student with id = " + id);
+            return new StudentNotFoundException();
+        });
         return FacultyMapper.toResponse(student.getFaculty());
+    }
+
+    public Long countStudents() {
+        logger.info("Was invoked method for count students");
+        return studentRepository.count();
+    }
+
+    public double getAverageAge() {
+        logger.info("Was invoked method for get average age");
+        return studentRepository.getAverageAge();
+    }
+
+    public List<StudentResponse> getLast5Students() {
+        logger.info("Was invoked method for get 5 last students");
+        List<Student> students = studentRepository.findAll(PageRequest.of(0, 5,
+                Sort.by(Sort.Direction.DESC, "id"))).getContent();
+        return students.stream()
+                .map(StudentMapper::toResponse)
+                .collect(Collectors.toList());
     }
 }
