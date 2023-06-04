@@ -317,4 +317,61 @@ public class StudentControllerTests {
                 .andExpect(jsonPath("$.[1].name").value(name2))
                 .andExpect(jsonPath("$.[1].age").value(age2));
     }
+
+    @Test
+    void getAllNamesStartWithA_shouldReturnListOfNames() throws Exception {
+        Long id = 1L;
+        Long id2 = 2L;
+        String name = "Andrea";
+        String name2 = "Amber";
+        int age = 17;
+        int age2 = 19;
+
+        Student student = new Student();
+        student.setId(id);
+        student.setName(name);
+        student.setAge(age);
+
+        Student student2 = new Student();
+        student2.setId(id2);
+        student2.setName(name2);
+        student2.setAge(age2);
+
+        when(studentRepository.findAll()).thenReturn(List.of(student2, student));
+
+        mockMvc. perform(MockMvcRequestBuilders
+                        .get("/student/name-star-A")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0]").value("AMBER"))
+                .andExpect(jsonPath("$.[1]").value("ANDREA"));
+    }
+
+    @Test
+    void getAverageAge2_shouldReturnNumber() throws Exception {
+        Long id = 1L;
+        Long id2 = 2L;
+        String name = "Andrea";
+        String name2 = "Amber";
+        int age = 20;
+        int age2 = 20;
+
+        Student student = new Student();
+        student.setId(id);
+        student.setName(name);
+        student.setAge(age);
+
+        Student student2 = new Student();
+        student2.setId(id2);
+        student2.setName(name2);
+        student2.setAge(age2);
+
+        when(studentRepository.findAll()).thenReturn(List.of(student, student2));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/student/average-age2")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string("20.0"));
+    }
 }

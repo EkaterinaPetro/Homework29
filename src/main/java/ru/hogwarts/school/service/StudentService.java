@@ -116,4 +116,23 @@ StudentService {
                 .map(StudentMapper::toResponse)
                 .collect(Collectors.toList());
     }
+
+    public List<String> getAllNamesStartWithA() {
+        logger.info("Was invoked method for get all names start with A");
+        return studentRepository.findAll()
+                .stream()
+                .map(Student::getName)
+                .map(String::toUpperCase)
+                .filter(name -> name.startsWith("A"))
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    public double getAverageAge2() {
+        logger.info("Was invoked method for get average age 2");
+        return studentRepository.findAll()
+                .stream()
+                .map(Student::getAge)
+                .collect(Collectors.averagingDouble(Integer::doubleValue));
+    }
 }

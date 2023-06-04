@@ -13,6 +13,7 @@ import ru.hogwarts.school.repository.FacultyRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class FacultyService {
@@ -86,5 +87,35 @@ public class FacultyService {
         return faculty.getStudents().stream()
                 .map(StudentMapper::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    public String getLongestName() {
+        logger.info("Was invoked method for get longest name");
+        return facultyRepository.findAll()
+                .stream()
+                .map(Faculty::getName)
+                .max((s1, s2) -> {
+                    if (s1.length() == s2.length()) {
+                        return 0;
+                    }
+                    if (s1.length() > s2.length()) {
+                        return 1;
+                    }
+                    return -1;
+                }).orElseThrow(FacultyNotFoundException::new);
+    }
+
+    public Long getSumFrom1To1000000() {
+        /*
+        Это еще быстрее, но тут нет стримов
+
+        Long n = 1000000L;
+        return  (1 + n)/2 * n;
+         */
+
+        return Stream.iterate(1, a -> a + 1)
+                .limit(1_000_000)
+                .mapToLong(Integer::longValue)
+                .sum();
     }
 }

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.hogwarts.school.exception.StudentNotFoundException;
 import ru.hogwarts.school.model.entity.Faculty;
-import ru.hogwarts.school.model.entity.Student;
 import ru.hogwarts.school.model.response.FacultyResponse;
 import ru.hogwarts.school.model.response.StudentResponse;
 import ru.hogwarts.school.repository.AvatarRepository;
@@ -170,5 +169,29 @@ public class StudentServiceTests {
         Assertions.assertEquals(24, students.get(3).getAge());
         Assertions.assertEquals("Oleg1", students.get(4).getName());
         Assertions.assertEquals(24, students.get(4).getAge());
+    }
+
+    @Test
+    void getAllNamesStartWithA_shouldReturnListOfNames() {
+        Faculty faculty = facultyRepository.save(new Faculty("test", "test"));
+        studentService.createStudent("Oleg", 24, faculty.getId());
+        studentService.createStudent("Andrea", 24, faculty.getId());
+        studentService.createStudent("Amber", 15, faculty.getId());
+
+        List<String> names = studentService.getAllNamesStartWithA();
+        Assertions.assertEquals(2, names.size());
+        Assertions.assertEquals("AMBER", names.get(0));
+        Assertions.assertEquals("ANDREA", names.get(1));
+    }
+
+    @Test
+    void getAverageAge2_shouldReturnNumber() {
+        Faculty faculty = facultyRepository.save(new Faculty("test", "test"));
+        studentService.createStudent("Oleg1", 24, faculty.getId());
+        studentService.createStudent("Oleg2", 24, faculty.getId());
+        studentService.createStudent("Oleg3", 24, faculty.getId());
+
+        double number = studentService.getAverageAge2();
+        Assertions.assertEquals(24, number);
     }
 }

@@ -71,4 +71,15 @@ public class FacultyController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/longest-name")
+    public String getLongestName() {
+        return facultyService.getLongestName();
+    }
+
+    @GetMapping("/sum")
+    public Long getSumFrom1To1000000() {
+        return facultyService.getSumFrom1To1000000();
+    }
+
 }
