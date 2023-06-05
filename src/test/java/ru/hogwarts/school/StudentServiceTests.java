@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.hogwarts.school.exception.StudentNotFoundException;
 import ru.hogwarts.school.model.entity.Faculty;
-import ru.hogwarts.school.model.entity.Student;
 import ru.hogwarts.school.model.response.FacultyResponse;
 import ru.hogwarts.school.model.response.StudentResponse;
 import ru.hogwarts.school.repository.AvatarRepository;
@@ -124,5 +123,75 @@ public class StudentServiceTests {
         StudentResponse student = studentService.createStudent("Oleg1", 24, faculty.getId());
         FacultyResponse result = studentService.getStudentFaculty(student.getId());
         Assertions.assertEquals(faculty.getId(), result.getId());
+    }
+
+    @Test
+    void countStudents_shouldReturnNumber() {
+        Faculty faculty = facultyRepository.save(new Faculty("test", "test"));
+        studentService.createStudent("Oleg1", 24, faculty.getId());
+        studentService.createStudent("Oleg2", 24, faculty.getId());
+        studentService.createStudent("Oleg3", 25, faculty.getId());
+
+        Long number = studentService.countStudents();
+        Assertions.assertEquals(3, number);
+    }
+
+    @Test
+    void getAverageAge_shouldReturnNumber() {
+        Faculty faculty = facultyRepository.save(new Faculty("test", "test"));
+        studentService.createStudent("Oleg1", 24, faculty.getId());
+        studentService.createStudent("Oleg2", 24, faculty.getId());
+        studentService.createStudent("Oleg3", 24, faculty.getId());
+
+        double number = studentService.getAverageAge();
+        Assertions.assertEquals(24, number);
+    }
+
+    @Test
+    void getLast5Students_shouldReturnListOfStudents() {
+        Faculty faculty = facultyRepository.save(new Faculty("test", "test"));
+        studentService.createStudent("Oleg1", 24, faculty.getId());
+        studentService.createStudent("Oleg2", 24, faculty.getId());
+        studentService.createStudent("Oleg3", 15, faculty.getId());
+        studentService.createStudent("Oleg4", 19, faculty.getId());
+        studentService.createStudent("Oleg5", 23, faculty.getId());
+
+        List<StudentResponse> students = studentService.getLast5Students();
+
+        Assertions.assertEquals(5, students.size());
+        Assertions.assertEquals("Oleg5", students.get(0).getName());
+        Assertions.assertEquals(23, students.get(0).getAge());
+        Assertions.assertEquals("Oleg4", students.get(1).getName());
+        Assertions.assertEquals(19, students.get(1).getAge());
+        Assertions.assertEquals("Oleg3", students.get(2).getName());
+        Assertions.assertEquals(15, students.get(2).getAge());
+        Assertions.assertEquals("Oleg2", students.get(3).getName());
+        Assertions.assertEquals(24, students.get(3).getAge());
+        Assertions.assertEquals("Oleg1", students.get(4).getName());
+        Assertions.assertEquals(24, students.get(4).getAge());
+    }
+
+    @Test
+    void getAllNamesStartWithA_shouldReturnListOfNames() {
+        Faculty faculty = facultyRepository.save(new Faculty("test", "test"));
+        studentService.createStudent("Oleg", 24, faculty.getId());
+        studentService.createStudent("Andrea", 24, faculty.getId());
+        studentService.createStudent("Amber", 15, faculty.getId());
+
+        List<String> names = studentService.getAllNamesStartWithA();
+        Assertions.assertEquals(2, names.size());
+        Assertions.assertEquals("AMBER", names.get(0));
+        Assertions.assertEquals("ANDREA", names.get(1));
+    }
+
+    @Test
+    void getAverageAge2_shouldReturnNumber() {
+        Faculty faculty = facultyRepository.save(new Faculty("test", "test"));
+        studentService.createStudent("Oleg1", 24, faculty.getId());
+        studentService.createStudent("Oleg2", 24, faculty.getId());
+        studentService.createStudent("Oleg3", 24, faculty.getId());
+
+        double number = studentService.getAverageAge2();
+        Assertions.assertEquals(24, number);
     }
 }
