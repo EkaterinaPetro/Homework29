@@ -102,4 +102,14 @@ public class StudentController {
     public double getAverageAge2() {
         return studentService.getAverageAge2();
     }
+
+    @GetMapping("/names")
+    public void printNames() {
+        studentService.printNames();
+    }
+
+    @GetMapping("/names2")
+    public void printNames2() {
+        studentService.printNames2();
+    }
 }

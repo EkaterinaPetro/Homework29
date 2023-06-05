@@ -17,6 +17,7 @@ import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -134,5 +135,69 @@ StudentService {
                 .stream()
                 .map(Student::getAge)
                 .collect(Collectors.averagingDouble(Integer::doubleValue));
+    }
+
+    public void printNames() {
+        logger.info("Was invoked method for print names");
+        List<String> names = studentRepository.findAll()
+                .stream()
+                .map(Student::getName)
+                .sorted()
+                .collect(Collectors.toList());
+
+        System.out.println(names.get(0));
+        System.out.println(names.get(1));
+
+        Thread thread1 = new Thread() {
+            @Override
+            public synchronized void start() {
+                System.out.println(names.get(2));
+                System.out.println(names.get(3));
+            }
+        };
+        Thread thread2 = new Thread(){
+            @Override
+            public synchronized void start() {
+                System.out.println(names.get(4));
+                System.out.println(names.get(5));
+            }
+        };
+
+        thread1.start();
+        thread2.start();
+    }
+
+    public void printNames2() {
+        logger.info("Was invoked method for print names 2");
+        List<String> names = studentRepository.findAll()
+                .stream()
+                .map(Student::getName)
+                .sorted()
+                .collect(Collectors.toList());
+
+        System.out.println(names.get(0));
+        System.out.println(names.get(1));
+
+        Thread thread1 = new Thread() {
+            @Override
+            public synchronized void start() {
+                synchronized (names) {
+                    System.out.println(names.get(2));
+                    System.out.println(names.get(3));
+                }
+            }
+        };
+        Thread thread2 = new Thread(){
+            @Override
+            public synchronized void start() {
+                synchronized (names) {
+                    System.out.println(names.get(4));
+                    System.out.println(names.get(5));
+                }
+            }
+        };
+
+        thread1.start();
+        thread2.start();
     }
 }
