@@ -150,14 +150,15 @@ StudentService {
 
         Thread thread1 = new Thread() {
             @Override
-            public synchronized void start() {
+            public void start() {
                 System.out.println(names.get(2));
                 System.out.println(names.get(3));
             }
         };
+
         Thread thread2 = new Thread(){
             @Override
-            public synchronized void start() {
+            public void start() {
                 System.out.println(names.get(4));
                 System.out.println(names.get(5));
             }
@@ -180,24 +181,24 @@ StudentService {
 
         Thread thread1 = new Thread() {
             @Override
-            public synchronized void start() {
-                synchronized (names) {
-                    System.out.println(names.get(2));
-                    System.out.println(names.get(3));
-                }
+            public void start() {
+                print(names.get(2));
+                print(names.get(3));
             }
         };
         Thread thread2 = new Thread(){
             @Override
-            public synchronized void start() {
-                synchronized (names) {
-                    System.out.println(names.get(4));
-                    System.out.println(names.get(5));
-                }
+            public void start() {
+                print(names.get(4));
+                print(names.get(5));
             }
         };
 
         thread1.start();
         thread2.start();
+    }
+
+    private synchronized void print(String name) {
+        System.out.println(name);
     }
 }
