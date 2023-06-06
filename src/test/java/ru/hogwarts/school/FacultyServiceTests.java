@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.hogwarts.school.exception.FacultyNotFoundException;
-import ru.hogwarts.school.model.entity.Faculty;
-import ru.hogwarts.school.model.entity.Student;
 import ru.hogwarts.school.model.response.FacultyResponse;
 import ru.hogwarts.school.model.response.StudentResponse;
 import ru.hogwarts.school.repository.FacultyRepository;
@@ -119,5 +117,14 @@ public class FacultyServiceTests {
         Assertions.assertEquals(24, students.get(0).getAge());
         Assertions.assertEquals("Oleg2", students.get(1).getName());
         Assertions.assertEquals(24, students.get(1).getAge());
+    }
+
+    @Test
+    void getLongestName_shouldReturnName() {
+        facultyService.createFaculty("Slytherin", "Green");
+        facultyService.createFaculty("Hufflepuff", "Yellow");
+
+        String name = facultyService.getLongestName();
+        Assertions.assertEquals("Hufflepuff", name);
     }
 }

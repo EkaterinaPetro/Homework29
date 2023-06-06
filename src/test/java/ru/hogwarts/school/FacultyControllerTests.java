@@ -12,21 +12,18 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.hogwarts.school.controller.FacultyController;
-import ru.hogwarts.school.controller.StudentController;
 import ru.hogwarts.school.model.entity.Faculty;
 import ru.hogwarts.school.model.entity.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.FacultyService;
-import ru.hogwarts.school.service.StudentService;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -259,5 +256,33 @@ public class FacultyControllerTests {
                 .andExpect(jsonPath("$.[1].id").value(id2))
                 .andExpect(jsonPath("$.[1].name").value(name2))
                 .andExpect(jsonPath("$.[1].age").value(age2));
+    }
+
+    @Test
+    void getLongestName_shouldReturnName() throws Exception {
+        Long id = 2L;
+        Long id2 = 1L;
+        String name = "Slytherin";
+        String name2 = "Hufflepuff";
+        String color = "Green";
+        String color2 = "Yellow";
+
+        Faculty faculty = new Faculty();
+        faculty.setId(id);
+        faculty.setName(name);
+        faculty.setColor(color);
+
+        Faculty faculty2 = new Faculty();
+        faculty2.setId(id2);
+        faculty2.setName(name2);
+        faculty2.setColor(color2);
+
+        when(facultyRepository.findAll()).thenReturn(List.of(faculty, faculty2));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/faculty/longest-name")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Hufflepuff"));
     }
 }
